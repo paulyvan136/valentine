@@ -390,6 +390,9 @@ Je t’aime infiniment 💗
 </audio>
 
 <script>
+    // ========== INITIALISATION IMMÉDIATE ==========
+    console.log("🚀 Script chargé !");
+    
     gsap.registerPlugin(ScrollTrigger);
 
     // ========== OPTIMISATION : LAZY LOADING ==========
@@ -412,7 +415,7 @@ Je t’aime infiniment 💗
     function createFloatingHearts() {
         const container = document.getElementById('hearts-container');
         let heartCount = 0;
-        const maxHearts = 5; // Réduit de 20 à 5
+        const maxHearts = 5;
         
         const heartInterval = setInterval(() => {
             if (heartCount >= maxHearts) return;
@@ -438,14 +441,15 @@ Je t’aime infiniment 💗
                     heartCount--;
                 }
             });
-        }, 4000); // Augmenté de 2000 à 4000ms
+        }, 4000);
     }
 
-    // QUESTION PAGE
+    // ========== QUESTION PAGE ==========
     function createQuestionHearts() {
+        console.log("💖 Création des cœurs de question...");
         const container = document.getElementById('question-hearts');
         if (!container) return;
-        for (let i = 0; i < 10; i++) { // Réduit de 15 à 10
+        for (let i = 0; i < 10; i++) {
             const heart = document.createElement('div');
             heart.innerHTML = '💖';
             heart.style.position = 'absolute';
@@ -458,12 +462,15 @@ Je t’aime infiniment 💗
         }
     }
 
-    const noBtn = document.getElementById('no-btn');
+    // ========== BOUTON NON ==========
     let noClickCount = 0;
     
     function moveNoButton(e) {
         e.preventDefault();
         noClickCount++;
+        const noBtn = document.getElementById('no-btn');
+        if (!noBtn) return;
+        
         const container = noBtn.parentElement;
         const rect = container.getBoundingClientRect();
         const maxX = Math.max(0, rect.width - noBtn.offsetWidth);
@@ -478,33 +485,36 @@ Je t’aime infiniment 💗
         else if (noClickCount === 5) noBtn.textContent = "S'il te plaît ? 🙏";
         else if (noClickCount > 10) noBtn.textContent = "Tu m'aimes quand même... 💔";
     }
-    
-    if (noBtn) {
-        noBtn.addEventListener('mouseover', moveNoButton);
-        noBtn.addEventListener('touchstart', moveNoButton);
-        noBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (noClickCount > 15) {
-                alert("D'accord ! Je t'aime quand même 😊💕");
-                setTimeout(acceptValentine, 1000);
-            } else {
-                moveNoButton(e);
-            }
-        });
-    }
 
+    // ========== ACCEPT VALENTINE (FONCTION PRINCIPALE) ==========
     function acceptValentine() {
+        console.log("✅ Bouton OUI cliqué !");
         const questionPage = document.getElementById('question-page');
         const preloader = document.getElementById('preloader');
         
-        for (let i = 0; i < 20; i++) createCelebrationHeart(); // Réduit de 30 à 20
+        if (!questionPage || !preloader) {
+            console.error("❌ Éléments manquants !");
+            return;
+        }
         
+        // Explosion de cœurs
+        for (let i = 0; i < 20; i++) {
+            createCelebrationHeart();
+        }
+        
+        // Fade out question page
         questionPage.style.opacity = '0';
+        
         setTimeout(() => {
             questionPage.style.display = 'none';
             preloader.style.display = 'flex';
             preloader.style.opacity = '1';
-            setTimeout(startMainSite, 2000);
+            console.log("⏳ Preloader affiché");
+            
+            setTimeout(() => {
+                console.log("🚀 Démarrage du site principal...");
+                startMainSite();
+            }, 2000);
         }, 1000);
     }
 
@@ -531,8 +541,14 @@ Je t’aime infiniment 💗
     }
 
     function startMainSite() {
+        console.log("🎬 Lancement du site principal...");
         const preloader = document.getElementById('preloader');
         const mainContent = document.getElementById('main-content');
+        
+        if (!preloader || !mainContent) {
+            console.error("❌ Éléments principaux manquants !");
+            return;
+        }
         
         gsap.to(preloader, {
             delay: 0.5,
@@ -541,19 +557,50 @@ Je t’aime infiniment 💗
             onComplete: () => {
                 preloader.style.display = "none";
                 mainContent.style.display = "block";
+                console.log("✅ Contenu principal affiché");
                 gsap.to(mainContent, {
                     opacity: 1,
                     duration: 0.5,
                     onComplete: () => {
+                        console.log("🎉 Initialisation des animations...");
                         initAnimations();
-                        lazyLoadImages(); // Active le lazy loading
+                        lazyLoadImages();
                     }
                 });
             }
         });
     }
 
-    window.addEventListener('load', createQuestionHearts);
+    // ========== INITIALISATION AU CHARGEMENT ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("📄 DOM chargé");
+        createQuestionHearts();
+        
+        // Setup bouton NON
+        const noBtn = document.getElementById('no-btn');
+        if (noBtn) {
+            console.log("👆 Bouton NON configuré");
+            noBtn.addEventListener('mouseover', moveNoButton);
+            noBtn.addEventListener('touchstart', moveNoButton);
+            noBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (noClickCount > 15) {
+                    alert("D'accord ! Je t'aime quand même 😊💕");
+                    setTimeout(acceptValentine, 1000);
+                } else {
+                    moveNoButton(e);
+                }
+            });
+        }
+        
+        // TEST: Vérifier que le bouton OUI fonctionne
+        const yesBtn = document.getElementById('yes-btn');
+        if (yesBtn) {
+            console.log("✅ Bouton OUI trouvé et prêt");
+        } else {
+            console.error("❌ Bouton OUI non trouvé !");
+        }
+    });
 
     // DATA
     const quizData = [
